@@ -1,2 +1,54 @@
-# Golang-CLI-calculator
-Golang CLI Calculator is a console calculator written in Go. It allows you to perform basic arithmetic operations (addition, subtraction, multiplication, division) directly from the terminal. The user enters numbers and an operator, and the program outputs the result of the calculation.
+# Golang CLI Calculator
+
+Простой калькулятор командной строки на Go. Поддерживает операции `+`, `-`, `*`, `/`, скобки и унарный минус.
+
+## Возможности
+
+- Сложение, вычитание, умножение, деление
+- Работа со скобками любой вложенности
+- Поддержка отрицательных чисел
+- Ввод выражений через командную строку
+
+## Установка и запуск
+
+1. Склонируйте репозиторий:
+```bash
+git clone https://github.com/Ol1g2195/Golang-CLI-calculator.git
+cd Golang-CLI-calculator
+```
+
+2. Перейдите в папку с проектом:
+```bash
+cd <папка-с-кодом>
+```
+3. Запустите программу:
+```bash
+go run main.go
+```
+Примеры работы:
+```bash
+Введите выражение:
+2 + 3 * (4 - 1)
+Результат 11
+```
+```bash
+Введите выражение:
+-5 + 2 * 3
+Результат 1
+```
+
+Как это работает
+
+Функция eval удаляет пробелы и рекурсивно вычисляет выражения в скобках.
+
+Функция calcFlat вычисляет выражение без скобок, соблюдая приоритет операций: сначала * и /, затем + и -.
+
+Результат выводится в терминал.
+
+Примечания
+
+Деление на ноль не обрабатывается (может вызвать ошибку).
+
+Поддерживаются только целые числа.
+
+Для выхода используйте Ctrl + C.
