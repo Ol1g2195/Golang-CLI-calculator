@@ -14,12 +14,11 @@
 1. Склонируйте репозиторий:
 ```bash
 git clone https://github.com/Ol1g2195/Golang-CLI-calculator.git
-cd Golang-CLI-calculator
 ```
 
 2. Перейдите в папку с проектом:
 ```bash
-cd <папка-с-кодом>
+cd Golang-CLI-calculator
 ```
 3. Запустите программу:
 ```bash
