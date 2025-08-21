@@ -77,7 +77,7 @@ func main() {
 
 	for {
 		scanner := bufio.NewScanner(os.Stdin)
-		fmt.Println("Введите команду(узнать команды /help):")
+		fmt.Println("Введите выражение:")
 
 		if valid := scanner.Scan(); !valid {
 			fmt.Println("Ошибка ввода")
@@ -92,3 +92,4 @@ func main() {
 	}
 
 }
+
