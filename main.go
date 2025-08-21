@@ -8,14 +8,21 @@ import (
 	"strings"
 )
 
-func eval(expression string) int {
+// Вычисление выражений в скобках и заменяем их на результат вычислений
+func Eval(expression string) (int, error) {
 	expression = strings.ReplaceAll(expression, " ", "")
 
 	for strings.Contains(expression, "(") {
 
-		start := strings.LastIndex(expression, "(")
-		end := strings.Index(expression[start:], ")") + start
-		val := eval(expression[start+1 : end])
+		start := strings.LastIndex(expression, "(")           // Ищем самую правую открывающую скобку
+		end := strings.Index(expression[start:], ")") + start // Ищем первую закрывающую скобку идущую после найденной открывающей
+		if start+1 == end {
+			return 0, fmt.Errorf("пустые скобки в выражении")
+		}
+		val, err := Eval(expression[start+1 : end])
+		if err != nil {
+			return 0, err
+		}
 		expression = expression[:start] + strconv.Itoa(val) + expression[end+1:]
 	}
 
@@ -23,16 +30,28 @@ func eval(expression string) int {
 
 }
 
-func calcFlat(expression string) int {
+// Проверка на унарный минус
+func Uns(i int, ch rune, expression string) bool {
+	return ((ch == '-' || ch == '+') && (i == 0 ||
+		expression[i-1] == '-' ||
+		expression[i-1] == '+' ||
+		expression[i-1] == '*' ||
+		expression[i-1] == '/'))
+}
+
+// Вычисляем выражение без скобок
+func calcFlat(expression string) (int, error) {
 	nums := []int{}
 	ops := []rune{}
 	num := ""
-
 	for i, ch := range expression {
-		if ch >= '0' && ch <= '9' || (ch == '-' && (i == 0 || expression[i-1] == '-' || expression[i-1] == '+' || expression[i-1] == '*' || expression[i-1] == '/')) {
+		if ch >= '0' && ch <= '9' || Uns(i, ch, expression) {
 			num += string(ch)
 		} else {
-			val, _ := strconv.Atoi(num)
+			val, err := strconv.Atoi(num)
+			if err != nil {
+				return 0, fmt.Errorf("Ошибка преобразования строки в число: %s", num)
+			}
 			nums = append(nums, val)
 			num = ""
 			ops = append(ops, ch)
@@ -40,19 +59,26 @@ func calcFlat(expression string) int {
 	}
 
 	if num != "" {
-		val, _ := strconv.Atoi(num)
+		val, err := strconv.Atoi(num)
+		if err != nil {
+			return 0, fmt.Errorf("Ошибка преобразования строки в число: %s", num)
+		}
 		nums = append(nums, val)
 	}
-
+	//Cначала считаем всем пары чисел которые перемножаются или делятся
 	for i := 0; i < len(ops); {
 		if ops[i] == '*' || ops[i] == '/' {
 			a, b := nums[i], nums[i+1]
 			var res int
+
 			if ops[i] == '*' {
 				res = a * b
+			} else if ops[i] == '/' && b == 0 {
+				return 0, fmt.Errorf("Деление на ноль")
 			} else {
 				res = a / b
 			}
+
 			nums[i] = res
 			nums = append(nums[:i+1], nums[i+2:]...)
 			ops = append(ops[:i], ops[i+1:]...)
@@ -61,6 +87,7 @@ func calcFlat(expression string) int {
 		}
 	}
 
+	//Считаем сложение и вычитание
 	res := nums[0]
 	for i, op := range ops {
 		if op == '+' {
@@ -70,26 +97,62 @@ func calcFlat(expression string) int {
 		}
 	}
 
-	return res
+	return res, nil
+}
+
+func validEnter(i int, expression string) bool {
+	return (((expression[i] == '+' ||
+		expression[i] == '-') &&
+		(expression[i+1] == '+' ||
+			expression[i+1] == '-')) ||
+		((expression[i] == '*' ||
+			expression[i] == '/') &&
+			(expression[i+1] == '*' ||
+				expression[i+1] == '/')))
 }
 
 func main() {
-
+	scanner := bufio.NewScanner(os.Stdin)
 	for {
-		scanner := bufio.NewScanner(os.Stdin)
-		fmt.Println("Введите выражение:")
+		fmt.Println("Введите команду(узнать команды /help):")
 
 		if valid := scanner.Scan(); !valid {
 			fmt.Println("Ошибка ввода")
 			return
 		}
 
-		expression := scanner.Text()
+		cmd := scanner.Text()
+		if cmd == "/help" {
+			fmt.Println("/help - список всех команд")
+			fmt.Println("/solve - решение задачи")
+			fmt.Println("/exit - выход из программы")
+		} else if cmd == "/solve" {
+			fmt.Println("Введите выражение:")
 
-		result := eval(expression)
+			if valid := scanner.Scan(); !valid {
+				fmt.Println("Ошибка ввода")
+				return
+			}
 
-		fmt.Println("Результат", result)
+			expression := scanner.Text()
+			for i := 0; i < len(expression)-1; i++ {
+				if validEnter(i, expression) {
+					fmt.Println("Ошибка ввода")
+					return
+				}
+			}
+			result, err := Eval(expression)
+			if err != nil {
+				fmt.Println("Ошибка:", err)
+				continue
+			} else {
+				fmt.Println("Результат", result)
+			}
+		} else if cmd == "/exit" {
+			break
+		} else {
+			fmt.Println("Вы ввели несуществующую команду, чтобы посмотреть список команд введите /help")
+		}
 	}
 
 }
-
