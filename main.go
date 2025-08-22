@@ -123,9 +123,11 @@ func main() {
 
 		cmd := scanner.Text()
 		if cmd == "/help" {
+			fmt.Println("---------------------------------")
 			fmt.Println("/help - список всех команд")
 			fmt.Println("/solve - решение задачи")
 			fmt.Println("/exit - выход из программы")
+			fmt.Println("---------------------------------")
 		} else if cmd == "/solve" {
 			fmt.Println("Введите выражение:")
 
@@ -156,3 +158,4 @@ func main() {
 	}
 
 }
+
